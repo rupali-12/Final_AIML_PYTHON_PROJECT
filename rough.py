@@ -144,10 +144,8 @@ def main():
 
     # Sidebar for API Key and file uploads based on file type selection
     with st.sidebar:
-        st.markdown("<h3 class='header'>API Key</h3>", unsafe_allow_html=True)
-
         st.markdown("<h3 class='header'>Upload Files</h3>", unsafe_allow_html=True)
-        file_type = st.radio("Select the type of content to upload and process", ('PDF', 'DOCX', 'TXT', 'URL'))
+        file_type = st.selectbox("Select the type of content to upload and process", ('PDF', 'DOCX', 'TXT', 'URL'))
 
         if file_type == 'PDF':
             pdf_docs = st.file_uploader("Upload your PDF Files", accept_multiple_files=True, type=['pdf'])
