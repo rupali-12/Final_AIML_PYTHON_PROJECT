@@ -1,0 +1,16 @@
+streamlit
+requests
+PyPDF
+numpy
+faiss-cpu
+torch
+transformers
+pydantic>=1.10.5
+langchain==0.0.51 
+langchainplus_sdk==0.0.8
+langchain_google_genai
+google-generativeai
+python-dotenv
+bs4
+openai
+python-docx
