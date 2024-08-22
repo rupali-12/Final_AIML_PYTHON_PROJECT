@@ -214,6 +214,7 @@ def main():
                     answer = user_input(user_question)
                     st.success("Here is your answer:")
                     st.markdown(f"<div class='message assistant-message'>{answer}</div>", unsafe_allow_html=True)
+                    st.session_state.user_input = ""
 
         # Display chat history and clear history button
         if st.session_state.chat_history:
