@@ -15,3 +15,4 @@ bs4
 openai
 langchain_community
 python-docx
+tiktoken
