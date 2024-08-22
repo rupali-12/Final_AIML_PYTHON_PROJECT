@@ -8,7 +8,7 @@ This project is a simple web application that extracts information from various 
 
 ### Deployed link
 
-[DEPLOYED_LINK]()
+[DEPLOYED_LINK](https://final-aiml-python-project-rupali-sharma.streamlit.app/)
 
 ## Project Structure
 
