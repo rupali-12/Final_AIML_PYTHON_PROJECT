@@ -16,10 +16,6 @@ from dotenv import load_dotenv
 # Set the page configuration at the top
 st.set_page_config(page_title="Intelligent Document Chatbot", page_icon="🤖", layout="wide")
 
-# Load environment variables from .env file
-load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
-
 # Custom CSS for enhanced UI
 st.markdown(
     """
@@ -98,13 +94,13 @@ def get_text_chunks(text):
     return chunks
 
 # Function to create and save a FAISS vector store for the text chunks
-def get_vector_store(text_chunks):
+def get_vector_store(text_chunks, openai_api_key):
     embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
     vector_store.save_local("faiss_index")
 
 # Function to create a conversational chain using the OpenAI API
-def get_conversational_chain():
+def get_conversational_chain(openai_api_key):
     prompt_template = """
     Answer the question as detailed as possible from the provided context. If the answer is not in
     the provided context, just say, "Answer is not available in the context"; don't provide the wrong answer.\n\n
@@ -117,15 +113,14 @@ def get_conversational_chain():
     chain = LLMChain(llm=model, prompt=prompt)
     return chain
 
-# Function to process user input
-def user_input(user_question):
+def user_input(user_question, openai_api_key):
     embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
     vector_store = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 
     context = vector_store.similarity_search(user_question, k=3)
     context_text = "\n".join([doc.page_content for doc in context])
 
-    chat_model = get_conversational_chain()
+    chat_model = get_conversational_chain(openai_api_key)  # Pass openai_api_key here
     response = chat_model({"context": context_text, "question": user_question})
     assistant_response = response['text']
 
@@ -161,7 +156,7 @@ def main():
                     with st.spinner("Processing PDFs..."):
                         raw_text = get_pdf_text(pdf_docs)
                         text_chunks = get_text_chunks(raw_text)
-                        get_vector_store(text_chunks)
+                        get_vector_store(text_chunks, openai_api_key)
                         st.success("PDF files have been processed. You can ask questions now!")
                         st.session_state.data_processed = True
 
@@ -174,7 +169,7 @@ def main():
                     with st.spinner("Processing DOCX files..."):
                         raw_text = get_docx_text(docx_files)
                         text_chunks = get_text_chunks(raw_text)
-                        get_vector_store(text_chunks)
+                        get_vector_store(text_chunks, openai_api_key)
                         st.success("DOCX files have been processed. You can ask questions now!")
                         st.session_state.data_processed = True
 
@@ -187,7 +182,7 @@ def main():
                     with st.spinner("Processing TXT files..."):
                         raw_text = get_txt_text(txt_files)
                         text_chunks = get_text_chunks(raw_text)
-                        get_vector_store(text_chunks)
+                        get_vector_store(text_chunks, openai_api_key)
                         st.success("TXT files have been processed. You can ask questions now!")
                         st.session_state.data_processed = True
 
@@ -201,7 +196,7 @@ def main():
                     with st.spinner("Processing URLs..."):
                         raw_text = get_url_text(urls)
                         text_chunks = get_text_chunks(raw_text)
-                        get_vector_store(text_chunks)
+                        get_vector_store(text_chunks, openai_api_key)
                         st.success("URLs have been processed. You can ask questions now!")
                         st.session_state.data_processed = True
 
@@ -216,7 +211,7 @@ def main():
                 st.warning("Please enter a question before submitting.")
             else:
                 with st.spinner("Getting the answer..."):
-                    answer = user_input(user_question)
+                    answer = user_input(user_question, openai_api_key)
                     st.success("Here is your answer:")
                     st.markdown(f"<div class='message assistant-message'>{answer}</div>", unsafe_allow_html=True)
 
