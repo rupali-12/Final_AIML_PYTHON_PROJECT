@@ -131,6 +131,8 @@ def user_input(user_question):
     st.session_state.chat_history.append({"user": user_question, "assistant": assistant_response})
     return assistant_response  # Return the assistant's response
 
+import streamlit as st
+
 def main():
     st.markdown("<h1 class='title'>Intelligent Document Chatbot</h1>", unsafe_allow_html=True)
     st.markdown("<h2 class='header'>Engage in Conversational Queries with Your Documents</h2>", unsafe_allow_html=True)
@@ -147,40 +149,42 @@ def main():
         st.markdown("<h3 class='header'>Upload Files</h3>", unsafe_allow_html=True)
         file_type = st.selectbox("Select the type of content to upload and process", ('PDF', 'DOCX', 'TXT', 'URL'))
 
+        uploaded_files = None  # Variable to hold uploaded files based on type
+
         if file_type == 'PDF':
-            pdf_docs = st.file_uploader("Upload your PDF Files", accept_multiple_files=True, type=['pdf'])
+            uploaded_files = st.file_uploader("Upload your PDF Files", accept_multiple_files=True, type=['pdf'])
             if st.button("Submit & Process PDFs"):
-                if not pdf_docs:
+                if not uploaded_files:
                     st.warning("Please upload PDF files before processing.")
                 else:
                     with st.spinner("Processing PDFs..."):
-                        raw_text = get_pdf_text(pdf_docs)
+                        raw_text = get_pdf_text(uploaded_files)
                         text_chunks = get_text_chunks(raw_text)
                         get_vector_store(text_chunks)
                         st.success("PDF files have been processed. You can ask questions now!")
                         st.session_state.data_processed = True
 
         elif file_type == 'DOCX':
-            docx_files = st.file_uploader("Upload your DOCX Files", accept_multiple_files=True, type=['docx'])
+            uploaded_files = st.file_uploader("Upload your DOCX Files", accept_multiple_files=True, type=['docx'])
             if st.button("Submit & Process DOCX"):
-                if not docx_files:
+                if not uploaded_files:
                     st.warning("Please upload DOCX files before processing.")
                 else:
                     with st.spinner("Processing DOCX files..."):
-                        raw_text = get_docx_text(docx_files)
+                        raw_text = get_docx_text(uploaded_files)
                         text_chunks = get_text_chunks(raw_text)
                         get_vector_store(text_chunks)
                         st.success("DOCX files have been processed. You can ask questions now!")
                         st.session_state.data_processed = True
 
         elif file_type == 'TXT':
-            txt_files = st.file_uploader("Upload your TXT Files", accept_multiple_files=True, type=['txt'])
+            uploaded_files = st.file_uploader("Upload your TXT Files", accept_multiple_files=True, type=['txt'])
             if st.button("Submit & Process TXT"):
-                if not txt_files:
+                if not uploaded_files:
                     st.warning("Please upload TXT files before processing.")
                 else:
                     with st.spinner("Processing TXT files..."):
-                        raw_text = get_txt_text(txt_files)
+                        raw_text = get_txt_text(uploaded_files)
                         text_chunks = get_text_chunks(raw_text)
                         get_vector_store(text_chunks)
                         st.success("TXT files have been processed. You can ask questions now!")
@@ -192,7 +196,7 @@ def main():
                 if not url_input.strip():
                     st.warning("Please enter at least one URL.")
                 else:
-                    urls = url_input.split("\n")
+                    urls = url_input.splitlines()  # Using splitlines for cleaner handling
                     with st.spinner("Processing URLs..."):
                         raw_text = get_url_text(urls)
                         text_chunks = get_text_chunks(raw_text)
@@ -214,7 +218,7 @@ def main():
                     answer = user_input(user_question)
                     st.success("Here is your answer:")
                     st.markdown(f"<div class='message assistant-message'>{answer}</div>", unsafe_allow_html=True)
-                    st.session_state.user_input = ""
+                    st.session_state.chat_history.append({'user': user_question, 'assistant': answer})  # Store the chat history
 
         # Display chat history and clear history button
         if st.session_state.chat_history:
@@ -228,7 +232,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
 
 
