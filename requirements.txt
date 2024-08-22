@@ -13,4 +13,5 @@ google-generativeai
 python-dotenv
 bs4
 openai
+langchain_community
 python-docx
