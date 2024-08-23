@@ -27,7 +27,7 @@ The backend is a Flask application that handles the extraction, embedding, and q
 2. Streamlit Run Command:
 
    ```bash
-   streamlit app.py
+   streamlit main.py
    ```
 
 ## Contributor
